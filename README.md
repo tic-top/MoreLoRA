@@ -30,7 +30,7 @@ $W = W_0 + (U_1V_1^T)\odot(U_2V_2^T)$ where $U=[U_1, U_2]\in \R^{m\times r}, V=[
 
 $W = W_0 + (U_1V_1^T)\odot(U_2V_2^T)\odot(U_3V_3^T)$ where $U=[U_1, U_2, U_3]\in \R^{m\times r}, V=[V_1,V_2, V_3]\in{\R^{n \times r}}$ and $rank((U_1V_1^T)\odot(U_2V_2^T)\odot(U_3V_3^T))\leq (\frac{r}{3})^3$. 
 
-$W = W_0 + \odot_{i=1}^{i=k}(U_iV_i^T)$ where $U=[U_i]_{i=1..k}\in \R^{m\times r}, V=[V_i]_{i=1..k}\in{\R^{n \times r}}$ and $rank(\odot_{i=1}^{i=k}(U_iV_i^T))\leq (\frac{r}{k})^k$. 
+$W = W_0 + \odot_{i=1}^{i=k}(U_iV_i^T)$ where $U=[U_i]_{i=1..k}\in \R^{m\times r}$, $V=[V_i]_{i=1..k}\in{\R^{n \times r}}$ and $rank(\odot_{i=1}^{i=k}(U_iV_i^T))\leq (\frac{r}{k})^k$. 
 
 
 ![r vs rank](\asset\r-vs-rank.png)
