@@ -10,7 +10,7 @@ Update:  24/4/2023
 
 ##### Original LoRA:
 
-$$W = W_0 + UV^T$ and $rank(UV^T)\leq r$$
+$W = W_0 + UV^T$ and $rank(UV^T)\leq r$
 
 We can do more than that.
 
@@ -33,7 +33,9 @@ $W = W_0 + (U_1V_1^T)\odot(U_2V_2^T)\odot(U_3V_3^T)$ where $U=[U_1, U_2, U_3]\in
 $W = W_0 + \odot_{i=1}^{i=k}(U_iV_i^T)$ where $U=[U_i]_{i=1..k}\in \R^{m\times r}$, $V=[V_i]_{i=1..k}\in{\R^{n \times r}}$ and $rank(\odot_{i=1}^{i=k}(U_iV_i^T))\leq (\frac{r}{k})^k$. 
 
 
-![r vs rank](\asset\r-vs-rank.png)
+<p align="center">
+<img src="asset/r-vs-rank.png" width="50%"></a>
+</p>
 
 ### Todo:
 
