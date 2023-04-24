@@ -8,24 +8,40 @@ Update:  24/4/2023
 
 ### Idea:
 
-$W = W_0 + UV^T$ and $rank(UV^T)\leq r$. 
+##### Original LoRA:
+
+$$W = W_0 + UV^T$ and $rank(UV^T)\leq r$$
 
 We can do more than that.
 
+##### Initialization:
+
 $W = W_0 - U_0{V_0}^T + UV^T$
+
+##### Additive LoRA:
 
 $W = W_0 + UI_{r(1\times \frac{n}{r})}+I_{r(\frac{m}{r}\times 1)}V^T$ where $U\in \R^{m\times r}, V\in{\R^{n \times r}}$ and $rank(UV^T)\leq 2r$. 
 
-$W = W_0 + (U_1V_1^T)\odot(U_2V_2^T)$ where $U=[U_1, U_2]\in \R^{m\times r}, V=[V_1,V_2]\in{\R^{n \times r}}$ and $rank(UV^T)\leq r^2/4$. 
+##### Hadamard LoRA:
+
+$W = W_0 + UV^T$ and $rank(UV^T)\leq r$. 
+
+$W = W_0 + (U_1V_1^T)\odot(U_2V_2^T)$ where $U=[U_1, U_2]\in \R^{m\times r}, V=[V_1,V_2]\in{\R^{n \times r}}$ and $rank( (U_1V_1^T)\odot(U_2V_2^T))\leq r^2/4$. 
+
+$W = W_0 + (U_1V_1^T)\odot(U_2V_2^T)\odot(U_3V_3^T)$ where $U=[U_1, U_2, U_3]\in \R^{m\times r}, V=[V_1,V_2, V_3]\in{\R^{n \times r}}$ and $rank((U_1V_1^T)\odot(U_2V_2^T)\odot(U_3V_3^T))\leq (\frac{r}{3})^3$. 
+
+$W = W_0 + \odot_{i=1}^{i=k}(U_iV_i^T)$ where $U=[U_i]_{i=1..k}\in \R^{m\times r}, V=[V_i]_{i=1..k}\in{\R^{n \times r}}$ and $rank(\odot_{i=1}^{i=k}(U_iV_i^T))\leq (\frac{r}{k})^k$. 
+
+
+![r vs rank](.\asset\r-vs-rank.png)
 
 ### Todo:
 
 - Learn from PEFT, LoRA and AdaLoRA
-- Derive the methods by hand
+- Derive the methods
 - Initialization $W = W_0 - U_0{V_0}^T + UV^T$
 - Substitute multiplication by addition
-- Estimate the parameter
-- Learn to analysis the code
+- Estimate the computation cost
 - Support Deepspeed
 
 ### Reference:
