@@ -28,8 +28,13 @@ $r'= \frac{r}{k}, U_i\in\mathbb{R}^{r'\times n}, V_i\in\mathbb{R}^{m\times r'}$a
 
 $\Delta = \odot_{i=1}^{i=k}(\tanh(U_iV_i^T))$ 
 
-
 $\Delta = \odot_{i=1}^{i=k}(\sigma(U_iV_i^T)) $
+
+##### DyLoRA:
+
+randomly update a series of ranks
+
+Update part of the layers
 
 ### Reference:
 

@@ -31,7 +31,7 @@ def experiment(type = 'mul',
                m = 512, 
                n = 256, 
                r = 1, 
-               k = 1, 
+               rr = 1, 
                regularization = False,
                num_experiments = 10, 
                verbose=False):
@@ -42,67 +42,61 @@ def experiment(type = 'mul',
     """
     ranks = np.zeros(num_experiments)
 
-    def lora(type):
-        if type == "h_mul" or type =="mul":
-            if not (r % k == 0):
-                raise Exception("r must be divisible by k")
-            rr = r // k
-            if not (m % rr == 0 and n % rr==0):
-                raise Exception("m and n must be divisible by r/k")
-            print(f"est rank: {min(m,n,(rr)**k)}")
+    def lora(type, r, rr):
+        if type == 'mul' or type == 'add':
+            rr = r
+        k = max(1, r//rr+1)
+        if 'mul' in type:
             def lora_h_mul():
                 U = np.random.normal(size=(m, r))
-                V = np.random.normal(size=(n, r))
+                V = np.random.normal(size=(r, n))
+                cnt = 0
                 # Computer W
                 for j in range(k):
-                    U1= U[:, j * rr : (j+1) * rr]
-                    V1= V[:, j * rr : (j+1) * rr]
-                    # Wi= U1.dot(Iu) + Iv.dot(V1.T)
-                    Wi = U1.dot(V1.T)
-                    if j==0:
-                        W = Wi
+                    if j*rr < r:
+                        Ui= U[:, j * rr : min(r,(j+1) * rr)]
+                        Vi= V[j * rr : min(r,(j+1) * rr), :]
+                        if j==0:
+                            W = Ui.dot(Vi)
+                        else:
+                            W *= Ui.dot(Vi)
+                        cnt += 1
                     else:
-                        W *= Wi
-                # Compute the rank of the W matrix
-                rank = np.linalg.matrix_rank(W)
-                return rank
+                        break
+                # print(cnt)
+                return np.linalg.matrix_rank(W)
             return lora_h_mul
-        elif type == 'h_add' or type == "add":
-            if not (r % k == 0):
-                raise Exception("r must be divisible by k")
-            rr = r // k
-            if not (m % rr == 0 and n % rr==0):
-                raise Exception("m and n must be divisible by r/k")
-            print(f"est rank: {min(m,n,(2*rr)**k)}")
-            
-            I = np.eye(rr)
-            Iu = np.vstack([I] * (n // rr)).T
-            Iv = np.vstack([I] * (m // rr))
+        else:
             def lora_h_add():
                 U = np.random.normal(size=(m, r))
-                V = np.random.normal(size=(n, r))
-                # Computer W
+                V = np.random.normal(size=(r, n))
+                cnt = 0
                 for j in range(k):
-                    U1= U[:, j * rr : (j+1) * rr]
-                    V1= V[:, j * rr : (j+1) * rr]
-                    Wi= U1.dot(Iu) + Iv.dot(V1.T)
-                    # print(np.linalg.matrix_rank(Wi))
-                    if j==0:
-                        W = Wi
+                    if j*rr < r:
+                        lb = j * rr
+                        ub = min(r,(j+1) * rr)
+                        delta = ub - lb
+                        Ui= U[:, lb : ub] # m * rr -> m * n
+                        Vi= V[lb : ub, :] # rr * n -> m * n
+                        Ui = np.hstack([Ui] * ((n-1)// delta + 1))[:,:n]
+                        Vi = np.vstack([Vi] * ((m-1)// delta + 1))[:m,:]
+                        if j==0:
+                            W = Ui + Vi
+                        else:
+                            W *= Ui + Vi
+                        cnt+=1
                     else:
-                        W *= Wi
-                # Compute the rank of the W matrix
-                rank = np.linalg.matrix_rank(W)
-                # print(rank)
-                return rank
+                        break
+                return np.linalg.matrix_rank(W)
             return lora_h_add
 
     try:   
-        func = lora(type)
+        func = lora(type, r, rr)
         print(f"trainbale: {r * (m+n) / (m*n)}")
         for i in range(num_experiments):
             ranks[i] = func()
         print(f"exp rank: {ranks[0]}")
+        print('----------------------')
         if verbose:
             # Display the histogram of ranks
             plt.hist(ranks,bins=range(max(1,-50+int(ranks[0]) ), 1+min(m,n,50+int(ranks[0]))), density=True)
